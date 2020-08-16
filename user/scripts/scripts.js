@@ -12,6 +12,7 @@
   var hostname = window.location.hostname;
   var urls = window.location.href.toLowerCase();
   var userId = $("#userGuid").val();
+  var addressIdList = [];
   function waitForElement(elementPath, callBack) {
     window.setTimeout(function () {
       if ($(elementPath).length) {
@@ -37,7 +38,7 @@
   }
 
   function getAddresses(callback) {
-    var apiUrl = packagePath + "/get_addresses.php";
+    var apiUrl = packagePath + "/get_address.php";
     var data = { userId: userId };
     $.ajax({
       url: apiUrl,
@@ -47,7 +48,7 @@
       success: function (response) {
         console.log(JSON.stringify(response));
         custom = $.parseJSON(response);
-        console.log($.parseJSON(response));
+        // console.log($.parseJSON(response));
         if (custom) {
           callback(custom.result.Records);
         }
@@ -55,31 +56,51 @@
     });
   }
 
-  function appendEmail() {
+  function deleteAddress(addressId) {
+    var apiUrl = packagePath + "/delete_address.php";
+    var data = { userId: userId, address_id: addressId };
+    $.ajax({
+      url: apiUrl,
+      method: "POST",
+      contentType: "application/json",
+      data: JSON.stringify(data),
+      success: function (response) {
+        console.log(JSON.stringify(response));
+      },
+    });
+  }
+
+  function loadId() {
     getAddresses(function (result) {
       $.each(result, function (index, addr) {
         var addId = addr.ID;
-        var email =
-          addr.SpecialInstructions != null ? addr.SpecialInstructions : " ";
-
         addressIdList.push(addId);
-        emailList.push(email);
       });
       addressIdList.reverse();
-      emailList.reverse();
 
-      $(".saved-address .address-box:not(.hasemail)").each(function (i) {
-        var first_line = $(this)
-          .find(".description")
-          .contents()
-          .filter(function () {
-            return !!$.trim(this.innerHTML || this.data);
-          })
-          .first();
-        first_line.after("<br>" + emailList[i]);
-        $(this).addClass("hasemail");
+      $(".address-inner .address-box:not(.hasid)").each(function (i) {
+        $(this).attr("address-id", addressIdList[i]);
+        $(this).addClass("hasid");
       });
     });
+  }
+  function addButton() {
+    let editicon = "<a id ='edit'><i class='icon icon-edit'></i></a>";
+    const imgLink =
+      "http://" +
+      hostname +
+      "/user/plugins/" +
+      packageId +
+      "/images/edit_btn.svg";
+    $(".address-inner")
+      .find(".address-box .action:not(.hasEdit)")
+      .each(function () {
+        console.log("cave man!");
+        $(this).append(editicon);
+        $(".icon-edit").css("background-image", imgLink);
+        $(this).addClass("hasEdit");
+      });
+    // });
   }
 
   function edit_address(ele) {
@@ -100,109 +121,96 @@
       .replace('<div class="description">', "")
       .trim()
       .split(" ");
-    var selectedCountry = editedInfo[2].trim();
+    var selectedCountry = editedInfo[3].trim();
     console.log(savedName);
 
     bootbox.confirm("Edit address?", function (result) {
       if (result) {
         $("#first-name").val(savedName[0].trim());
         $("#last-name").val(savedName[1].trim());
-        $("#contact-email").val();
-        $("#myaddress").val(editedInfo[1].trim());
-        $("#country").val(editedInfo[3].trim());
-        $("#state").val(editedInfo[3].trim());
-        $("#city").val(editedInfo[4].trim());
-        $("#postal-code").val(editedInfo[5].trim().replace("</div>", ""));
+        $("#contact-email").val(editedInfo[1].trim());
+        $("#myaddress").val(editedInfo[2].trim());
+        $("#country").removeAttr("selected");
+        $("select[name=country] option:contains(" + selectedCountry + ")").attr(
+          "selected",
+          "selected"
+        );
+
+        $("#state").val(editedInfo[4].trim());
+        $("#city").val(editedInfo[5].trim());
+        $("#postal-code").val(editedInfo[6].trim().replace("</div>", ""));
 
         target.addClass("edit").show();
-        target.parents("body").find("#add-new-delivery-ads").show();
-        target.parents("body").find("#add-new-ads").hide();
-        target.parents("body").find(".saved-address").hide();
-        console.log(
-          target.parents("body").find("#add-new-delivery-ads").length
-        );
-        target
-          .parents("body")
-          .find("#add-new-delivery-ads")
-          .find("input[name=ads-first-name]")
-          .val(savedName[0].trim());
-        target
-          .parents("body")
-          .find("#add-new-delivery-ads")
-          .find("input[name=ads-last-name]")
-          .val(savedName[1].trim());
-        target
-          .parents("body")
-          .find("#add-new-delivery-ads")
-          .find("input[name=address]")
-          .val(editedInfo[1].trim());
-        target
-          .parents("body")
-          .find("#add-new-delivery-ads")
-          .find("select[name=country] option")
-          .removeAttr("selected");
-        target
-          .parents("body")
-          .find("#add-new-delivery-ads")
-          .find("select[name=country] option:contains(" + selectedCountry + ")")
-          .attr("selected", "selected");
-        target
-          .parents("body")
-          .find("#add-new-delivery-ads")
-          .find("input[name=state]")
-          .val(editedInfo[3].trim());
-        target
-          .parents("body")
-          .find("#add-new-delivery-ads")
-          .find("input[name=city]")
-          .val(editedInfo[4].trim());
-        target
-          .parents("body")
-          .find("#add-new-delivery-ads")
-          .find("input[name=postalcode]")
-          .val(editedInfo[5].trim().replace("</div>", ""));
-        //target.parents('body').find('#address-form').find(".my-btn.btn-black").val("SAVE");
-        target
-          .parents("body")
-          .find("#add-new-delivery-ads")
-          .find(".chk-add-btn")
-          .attr("onclick", "save_edit_address(this);");
-        target
-          .parents("body")
-          .find("#add-new-delivery-ads")
-          .find(".chk-cancel-btn")
-          .attr("onclick", "cancel_edit_address(this);");
-        //target.parents('body').find('#address-form').find(".my-btn.btn-black").after('<input onclick="cancel_edit_address(this);" type="button" class="my-btn cancel-edit" value="CANCEL">')
       }
     });
   }
+  function save_address(addressId) {}
 
   $(document).ready(function () {
     if (
       pathname.indexOf("user/order/deliverydetail") > -1 ||
-      pathname.indexOf("user/marketplace/user-settings") > -1
+      pathname.indexOf("user/marketplace/user-settings") > -1 ||
+      pathname.indexOf("/user/marketplace/seller-settings") > -1
     ) {
-      console.log("here");
-      waitForElement(".address-box .action", function () {
-        console.log("0000");
-        let editicon = "<a id ='edit'><i class='icon icon-edit'></i></a>";
-        const imgLink =
-          "http://" +
-          hostname +
-          "/user/plugins/" +
-          packageId +
-          "/images/edit_btn.svg";
-        $(".address-inner")
-          .find(".address-box")
-          .each(function () {
-            console.log("cave man!");
-            $(".address-box .action").append(editicon);
-            $(".icon-edit").css("background-image", imgLink);
-          });
+      var last_tab = localStorage.getItem("last_tab");
+      if (last_tab == "address-tab") {
+        console.log("localstorage get");
+        $("#profie-tab").removeClass("active");
+        waitForElement("#jobtitle", function () {
+          if ($("#jobtitle").val()) {
+            console.log("switching tabs");
+            $("#address-tab").click();
+            localStorage.removeItem("last_tab");
+          }
+        });
+      }
+
+      // $(window).unload(function () {
+      //   localStorage.removeItem("last_tab");
+      // });
+
+      $.ajaxPrefilter(function (options, originalOptions, jqXHR) {
+        if (
+          options.type.toLowerCase() === "post" &&
+          options.url.toLowerCase().indexOf("/settings/insertaddress") >= 0
+        ) {
+          let success = options.success;
+          var email = $("#contact-email").val();
+          console.log("email in ajax " + email);
+          // $.extend(options.data, { 'SpecialInstructions': email });
+          options.data += "&" + $.param({ SpecialInstructions: email });
+          options.success = function (data, textStatus, jqXHR) {
+            console.log("data " + data);
+            localStorage.setItem("last_tab", "address-tab");
+            location.reload();
+            if (typeof success === "function")
+              return success(data, textStatus, jqXHR);
+          };
+        }
       });
 
-      $("body").on("click", "#edit", function () {
-        edit_address($(this));
+      loadId();
+      addButton();
+
+      $(".address-inner .address-box")
+        .find("#edit")
+        .on("click", function () {
+          $(this).parents(".address-inner .address-box").addClass("toEdit");
+          $("#address-form .btn-area .my-btn").addClass("forEdit");
+          edit_address($(this));
+        });
+
+      //save button
+      $("body").on("click", "#address-form .btn-area .forEdit", function () {
+        console.log("button clicked!");
+        var address_id = $(".address-inner").find(".toEdit").attr("address-id");
+        console.log(address_id);
+        deleteAddress(address_id);
+      });
+
+      $("body").on("click", "#address-tab", function () {
+        loadId();
+        addButton();
       });
     }
   });
