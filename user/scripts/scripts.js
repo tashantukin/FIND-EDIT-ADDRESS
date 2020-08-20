@@ -65,7 +65,8 @@
       contentType: "application/json",
       data: JSON.stringify(data),
       success: function (response) {
-        console.log(JSON.stringify(response));
+        $(".address-inner").find(".toEdit").parent("div").remove();
+        $(".saved-address").find(".toEdit").remove();
       },
     });
   }
@@ -79,6 +80,21 @@
       addressIdList.reverse();
 
       $(".address-inner .address-box:not(.hasid)").each(function (i) {
+        $(this).attr("address-id", addressIdList[i]);
+        $(this).addClass("hasid");
+      });
+    });
+  }
+
+  function loadIdDelivery() {
+    getAddresses(function (result) {
+      $.each(result, function (index, addr) {
+        var addId = addr.ID;
+        addressIdList.push(addId);
+      });
+      addressIdList.reverse();
+
+      $(".saved-address .address-box:not(.hasid)").each(function (i) {
         $(this).attr("address-id", addressIdList[i]);
         $(this).addClass("hasid");
       });
@@ -103,7 +119,31 @@
     // });
   }
 
+  function addButtonDelivery() {
+    let editicon =
+      "<span class='edit-address'><a id ='edit'><i class='icon icon-edit'></i></a></span>";
+    const imgLink =
+      "http://" +
+      hostname +
+      "/user/plugins/" +
+      packageId +
+      "/images/edit_btn.svg";
+    $(".svd-adrsbox-inner")
+      .find(".action:not(.hasEdit)")
+      .each(function () {
+        console.log("cave man!");
+        $(this).append(editicon);
+        $(".icon-edit").css("background-image", imgLink);
+        $(this).addClass("hasEdit");
+      });
+    // });
+  }
+
   function edit_address(ele) {
+    //for delivery settings page
+    $("#add-new-ads").hide();
+    $("#add-new-delivery-ads").show();
+
     var that = jQuery(ele);
     var attributeVal = [];
     var target = that.parents(".address-box");
@@ -126,9 +166,13 @@
 
     bootbox.confirm("Edit address?", function (result) {
       if (result) {
+        $("#ads-first-name").val(savedName[0].trim());
         $("#first-name").val(savedName[0].trim());
         $("#last-name").val(savedName[1].trim());
+        $("#ads-last-name").val(savedName[1].trim());
         $("#contact-email").val(editedInfo[1].trim());
+        $("#delEmail").val(editedInfo[1].trim());
+        $("#address").val(editedInfo[2].trim());
         $("#myaddress").val(editedInfo[2].trim());
         $("#country").removeAttr("selected");
         $("select[name=country] option:contains(" + selectedCountry + ")").attr(
@@ -139,6 +183,7 @@
         $("#state").val(editedInfo[4].trim());
         $("#city").val(editedInfo[5].trim());
         $("#postal-code").val(editedInfo[6].trim().replace("</div>", ""));
+        $("#postalcode").val(editedInfo[6].trim().replace("</div>", ""));
 
         target.addClass("edit").show();
       }
@@ -148,47 +193,9 @@
 
   $(document).ready(function () {
     if (
-      pathname.indexOf("user/order/deliverydetail") > -1 ||
       pathname.indexOf("user/marketplace/user-settings") > -1 ||
       pathname.indexOf("/user/marketplace/seller-settings") > -1
     ) {
-      var last_tab = localStorage.getItem("last_tab");
-      if (last_tab == "address-tab") {
-        console.log("localstorage get");
-        $("#profie-tab").removeClass("active");
-        waitForElement("#jobtitle", function () {
-          if ($("#jobtitle").val()) {
-            console.log("switching tabs");
-            $("#address-tab").click();
-            localStorage.removeItem("last_tab");
-          }
-        });
-      }
-
-      // $(window).unload(function () {
-      //   localStorage.removeItem("last_tab");
-      // });
-
-      $.ajaxPrefilter(function (options, originalOptions, jqXHR) {
-        if (
-          options.type.toLowerCase() === "post" &&
-          options.url.toLowerCase().indexOf("/settings/insertaddress") >= 0
-        ) {
-          let success = options.success;
-          var email = $("#contact-email").val();
-          console.log("email in ajax " + email);
-          // $.extend(options.data, { 'SpecialInstructions': email });
-          options.data += "&" + $.param({ SpecialInstructions: email });
-          options.success = function (data, textStatus, jqXHR) {
-            console.log("data " + data);
-            localStorage.setItem("last_tab", "address-tab");
-            location.reload();
-            if (typeof success === "function")
-              return success(data, textStatus, jqXHR);
-          };
-        }
-      });
-
       loadId();
       addButton();
 
@@ -211,6 +218,28 @@
       $("body").on("click", "#address-tab", function () {
         loadId();
         addButton();
+      });
+    }
+
+    if (pathname.indexOf("user/order/deliverydetail") > -1) {
+      addButtonDelivery();
+      loadIdDelivery();
+
+      $(".address-box .svd-adrsbox-inner")
+        .find("#edit")
+        .on("click", function () {
+          $(this).parents(".address-box").addClass("toEdit");
+          $("#add-new-delivery-ads .chk-add-btn").addClass("forEdit");
+
+          edit_address($(this));
+        });
+
+      //save button
+      $("body").on("click", "#add-new-delivery-ads .forEdit", function () {
+        console.log("button clicked!");
+        var address_id = $(".saved-address").find(".toEdit").attr("address-id");
+        console.log(address_id);
+        deleteAddress(address_id);
       });
     }
   });
