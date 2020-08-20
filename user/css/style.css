@@ -7,3 +7,25 @@
   border: 1px solid #000 !important;
   color: #000;
 }
+
+.saved-address .address-box .action span .icon-edit {
+  width: 34px;
+  height: 34px;
+  margin-left: 10px;
+  margin-right: 10px;
+  margin-top: 4px;
+}
+
+.saved-address .address-box .action span .icon-edit2 {
+  width: 40px;
+  height: 40px;
+  margin-right: 10px;
+  border: 1px solid #b2b2b2;
+  background-color: #fff;
+}
+
+.icon.icon-edit2 {
+  background-image: url(../images/pencil_only.svg);
+  height: 32px;
+  width: 32px;
+}

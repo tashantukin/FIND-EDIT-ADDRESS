@@ -130,19 +130,20 @@
 
   function addButtonDelivery() {
     let editicon =
-      "<span class='edit-address'><a id ='edit'><i class='icon icon-edit'></i></a></span>";
+      "<span class='remove-address'><a id ='edit'><i class='icon icon-edit2'></i></a></span>";
     const imgLink =
       "http://" +
       hostname +
       "/user/plugins/" +
       packageId +
-      "/images/edit_btn.svg";
+      "/images/pencil_only.svg";
     $(".svd-adrsbox-inner")
-      .find(".action:not(.hasEdit)")
+      .find(".action:not(.hasEdit) .address-sel")
       .each(function () {
         console.log("cave man!");
-        $(this).append(editicon);
-        $(".icon-edit").css("background-image", imgLink);
+        $(this).after(editicon);
+
+        $(".icon-edit2").css("background-image", imgLink);
         $(this).addClass("hasEdit");
       });
     // });
