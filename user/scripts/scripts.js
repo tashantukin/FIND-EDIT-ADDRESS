@@ -23,6 +23,15 @@
     }, 500);
   }
 
+  function scroll_to(div) {
+    $("html, body").animate(
+      {
+        scrollTop: div.offset().top,
+      },
+      1000
+    );
+  }
+
   function getMarketplaceCustomFields(callback) {
     var apiUrl = "/api/v2/marketplaces";
     $.ajax({
@@ -141,8 +150,6 @@
 
   function edit_address(ele) {
     //for delivery settings page
-    $("#add-new-ads").hide();
-    $("#add-new-delivery-ads").show();
 
     var that = jQuery(ele);
     var attributeVal = [];
@@ -166,6 +173,19 @@
 
     bootbox.confirm("Edit address?", function (result) {
       if (result) {
+        //if delivery page
+        if ($("#add-new-ads").length) {
+          $("#add-new-ads").hide();
+          $("#add-new-delivery-ads").show();
+
+          var editDiv = $("#add-new-delivery-ads");
+          scroll_to(editDiv);
+        }
+        //if settings page
+        if ($("#first-name").length) {
+          $(window).scrollTop(0);
+        }
+
         $("#ads-first-name").val(savedName[0].trim());
         $("#first-name").val(savedName[0].trim());
         $("#last-name").val(savedName[1].trim());
@@ -204,6 +224,7 @@
         .on("click", function () {
           $(this).parents(".address-inner .address-box").addClass("toEdit");
           $("#address-form .btn-area .my-btn").addClass("forEdit");
+
           edit_address($(this));
         });
 
