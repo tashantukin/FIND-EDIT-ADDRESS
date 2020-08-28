@@ -240,25 +240,40 @@
           $("#ads-last-name").val(savedName[1].trim());
           $("#delEmail").val(editedInfo[1].trim());
           $("#address").val(editedInfo[2].trim());
-          $("#postal-code").val(editedInfo[6].trim().replace("</div>", ""));
-
+          $("#postalcode").val(editedInfo[6].trim().replace("</div>", ""));
+          $("#country").removeAttr("selected");
+          $("select[name=country] option:contains(" + selectedCountry + ")").attr(
+            "selected",
+            "selected"
+          );
+          $("#state").val(editedInfo[4].trim());
+          $("#city").val(editedInfo[5].trim());
 
         } else {
           $("#first-name").val(savedName[0].trim());
           $("#last-name").val(savedName[1].trim());
           $("#contact-email").val(editedInfo[1].trim());
           $("#myaddress").val(editedInfo[2].trim());
+
+          $("#postal-code").val(editedInfo[6].trim().replace("</div>", ""));
+          $("#country").removeAttr("selected");
+          $("select[name=country] option:contains(" + selectedCountry + ")").attr(
+            "selected",
+            "selected"
+          );
+          $("#state").val(editedInfo[4].trim());
+          $("#city").val(editedInfo[5].trim());
+
         }
 
+        // $("#country").removeAttr("selected");
+        // $("select[name=country] option:contains(" + selectedCountry + ")").attr(
+        //   "selected",
+        //   "selected"
+        // );
+        // $("#state").val(editedInfo[4].trim());
+        // $("#city").val(editedInfo[5].trim());
 
-        $("#country").removeAttr("selected");
-        $("select[name=country] option:contains(" + selectedCountry + ")").attr(
-          "selected",
-          "selected"
-        );
-        $("#state").val(editedInfo[4].trim());
-        $("#city").val(editedInfo[5].trim());
-        $("#postalcode").val(editedInfo[6].trim().replace("</div>", ""));
 
         target.parents('body').find('#address-form').find(".my-btn.btn-black").val("SAVE");
         // target.parents('body').find('#address-form').find(".my-btn.btn-black").attr('onclick', 'save_edit_address(this);');
@@ -320,6 +335,8 @@
         console.log(address_id);
         deleteAddress(address_id);
         $(this).removeClass('forEdit');
+        $('#cancel').remove();
+        $('#contact-email').val('');
 
       });
 
