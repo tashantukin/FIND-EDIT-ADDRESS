@@ -36,8 +36,6 @@
     );
   }
 
-
-
   function getMarketplaceCustomFields(callback)
   {
     var apiUrl = "/api/v2/marketplaces";
@@ -209,16 +207,14 @@
       .trim()
       .replace('<div class="description">', "")
       .trim()
-      .split(" ");
+      .split(" ").toString();
+
     var selectedCountry = editedInfo[3].trim();
     console.log(savedName);
 
     bootbox.confirm("Edit address?", function (result)
     {
       if (result) {
-
-
-
         //if delivery page
         if ($("#add-new-ads").length) {
           $("#add-new-ads").hide();
@@ -236,8 +232,12 @@
           var cancelbutton = "<a href='' class='chk-add-btn btn-black-small-cmn' id = 'delcancel'>CANCEL</a>";
           $('.forEdit').before(cancelbutton);
 
-          $("#ads-first-name").val(savedName[0].trim());
-          $("#ads-last-name").val(savedName[1].trim());
+          var firstWords = savedName.substring(0, savedName.lastIndexOf(",")).replace(',', " ");;
+          var lastWord = savedName.split(",").splice(-1)
+
+          $("#ads-first-name").val(firstWords);
+
+          $("#ads-last-name").val(lastWord);
           $("#delEmail").val(editedInfo[1].trim());
           $("#address").val(editedInfo[2].trim());
           $("#postalcode").val(editedInfo[6].trim().replace("</div>", ""));
@@ -250,8 +250,11 @@
           $("#city").val(editedInfo[5].trim());
 
         } else {
-          $("#first-name").val(savedName[0].trim());
-          $("#last-name").val(savedName[1].trim());
+          var firstWords = savedName.substring(0, savedName.lastIndexOf(",")).replace(',', " ");
+          var lastWord = savedName.split(",").splice(-1)
+
+          $("#first-name").val(firstWords);
+          $("#last-name").val(lastWord);
           $("#contact-email").val(editedInfo[1].trim());
           $("#myaddress").val(editedInfo[2].trim());
 
@@ -265,15 +268,6 @@
           $("#city").val(editedInfo[5].trim());
 
         }
-
-        // $("#country").removeAttr("selected");
-        // $("select[name=country] option:contains(" + selectedCountry + ")").attr(
-        //   "selected",
-        //   "selected"
-        // );
-        // $("#state").val(editedInfo[4].trim());
-        // $("#city").val(editedInfo[5].trim());
-
 
         target.parents('body').find('#address-form').find(".my-btn.btn-black").val("SAVE");
         // target.parents('body').find('#address-form').find(".my-btn.btn-black").attr('onclick', 'save_edit_address(this);');
@@ -310,6 +304,7 @@
     if (
       pathname.indexOf("user/marketplace/user-settings") > -1 ||
       pathname.indexOf("/user/marketplace/seller-settings") > -1
+
     ) {
       loadId();
       addButton();
@@ -324,8 +319,6 @@
 
           edit_address($(this), 'user settings');
         });
-
-
 
       //save button
       $("body").on("click", "#address-form .btn-area .forEdit", function ()
@@ -368,7 +361,6 @@
         edit_address($(this), 'delivery');
 
       });
-
 
       //save button
       $("body").on("click", "#add-new-delivery-ads .forEdit", function ()
