@@ -25,6 +25,11 @@
       }
     }, 500);
   }
+  function validateEmail($email)
+  {
+    var emailReg = /^([\w-\.]+@([\w-]+\.)+[\w-]{2,4})?$/;
+    return emailReg.test($email);
+  }
 
   function scroll_to(div)
   {
@@ -249,7 +254,8 @@
           $("#state").val(editedInfo[4].trim());
           $("#city").val(editedInfo[5].trim());
 
-        } else {
+        }
+        else {
           var firstWords = savedName.substring(0, savedName.lastIndexOf(",")).replace(',', " ");
           var lastWord = savedName.split(",").splice(-1)
 
@@ -259,13 +265,38 @@
           $("#myaddress").val(editedInfo[2].trim());
 
           $("#postal-code").val(editedInfo[6].trim().replace("</div>", ""));
-          $("#country").removeAttr("selected");
+
+
+          // $("#country").removeAttr("selected");
+          $("#country option").removeAttr("selected");
+
           $("select[name=country] option:contains(" + selectedCountry + ")").attr(
             "selected",
             "selected"
           );
+
           $("#state").val(editedInfo[4].trim());
           $("#city").val(editedInfo[5].trim());
+
+          //for automation values --clear first
+          $('#automation_name').val("");
+          $('#automation_contact_number').val("");
+          $('#automation_email').val("");
+          $('#automation_address').val("");
+          $('#automation_country').val("");
+          $('#automation_state').val("");
+          $('#automation_city').val("");
+          $('#automation_postalcode').val("");
+
+          //add values
+          $('#automation_name').val(firstWords);
+          $('#automation_contact_number').val(lastWord);
+          $('#automation_email').val(editedInfo[1].trim());
+          $('#automation_address').val(editedInfo[2].trim());
+          $('#automation_country').val(selectedCountry);
+          $('#automation_state').val(editedInfo[4].trim());
+          $('#automation_city').val(editedInfo[5].trim());
+          $('#automation_postalcode').val(editedInfo[6].trim().replace("</div>", ""));
 
         }
 
@@ -287,7 +318,7 @@
     that.parents('body').find('#address-form').find("#last-name").val("");
     that.parents('body').find('#address-form').find("#myaddress").val("");
     that.parents('body').find('#address-form').find('#country option').removeAttr('selected');
-    that.parents('body').find('#address-form').find('#country option:contains("SELECT..")').attr('selected', 'selected');
+    that.parents('body').find('#address-form').find('#country option:contains("(Select Country)")').attr('selected', 'selected');
     that.parents('body').find('#address-form').find("#state").val("");
     that.parents('body').find('#address-form').find("#city").val("");
     that.parents('body').find('#address-form').find("#contact-email").val("");
@@ -299,6 +330,19 @@
 
   }
 
+  function appendElementForAutomation()
+  {
+    $('body').append('<input type = hidden id=automation_name>');
+    $('body').append('<input type = hidden id=automation_contact_number>');
+    $('body').append('<input type = hidden id=automation_email>');
+    $('body').append('<input type = hidden id=automation_address>');
+    $('body').append('<input type = hidden id=automation_country>');
+    $('body').append('<input type = hidden id=automation_state>');
+    $('body').append('<input type = hidden id=automation_city>');
+    $('body').append('<input type = hidden id=automation_postalcode>');
+
+  }
+
   $(document).ready(function ()
   {
     if (
@@ -306,6 +350,8 @@
       pathname.indexOf("/user/marketplace/seller-settings") > -1
 
     ) {
+
+      appendElementForAutomation();
       loadId();
       addButton();
 
@@ -323,13 +369,19 @@
       //save button
       $("body").on("click", "#address-form .btn-area .forEdit", function ()
       {
-        console.log("button clicked!");
-        var address_id = $(".address-inner").find(".toEdit").attr("address-id");
-        console.log(address_id);
-        deleteAddress(address_id);
-        $(this).removeClass('forEdit');
-        $('#cancel').remove();
-        $('#contact-email').val('');
+        //Add validation here before saving
+        // || !validateEmail($('#contact-email').val()
+        if ($('#first-name').val() == "" || $('#last-name').val() == "" || $('#contact-email').val() == "" || $('#myaddress').val() == "" || $('#country').val() == "(Select Country)" || $('#state').val() == "" || $('#city').val() == "" || $('#postal-code').val() == "") {
+          console.log('handled validation');
+        } else {
+          console.log("button clicked!");
+          var address_id = $(".address-inner").find(".toEdit").attr("address-id");
+          console.log(address_id);
+          deleteAddress(address_id);
+          $(this).removeClass('forEdit');
+          $('#cancel').remove();
+          $('#contact-email').val('');
+        }
 
       });
 
@@ -365,10 +417,17 @@
       //save button
       $("body").on("click", "#add-new-delivery-ads .forEdit", function ()
       {
-        var address_id = $(".saved-address").find(".toEdit").attr("address-id");
-        console.log(address_id);
-        deleteAddress(address_id);
-        $('#delcancel').remove();
+
+        if ($('#ads-first-name').val() == "" || $('#ads-last-name').val() == "" || $('#delEmail').val() == "" || $('#address').val() == "" || $('#country').val() == "(Select Country)" || $('#state').val() == "" || $('#city').val() == "" || $('#postalcode').val() == "") {
+          console.log('handled validation');
+        } else {
+
+          var address_id = $(".saved-address").find(".toEdit").attr("address-id");
+          console.log(address_id);
+          deleteAddress(address_id);
+          $('#delcancel').remove();
+
+        }
       });
 
       $("body").on("click", "#cancel", function ()

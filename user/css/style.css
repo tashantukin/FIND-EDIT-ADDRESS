@@ -26,3 +26,14 @@
   flex-direction: row-reverse;
   align-items: center;
 }
+
+
+.my-btn.cancel-edit {
+  margin-left: 15px;
+  background-color: #fff;
+  width: 150px;
+  margin-top: 10px;
+  border-radius: 30px;
+  border: 1px solid #000 !important;
+  color: #000;
+}
