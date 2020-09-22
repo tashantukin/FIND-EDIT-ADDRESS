@@ -191,6 +191,73 @@
     // });
   }
 
+  function cloneSavedAddress(ele)
+  {
+    var that = jQuery(ele);
+    var attributeVal = [];
+    var target = that;
+    var brExp = /<br\s*\/?>/i;
+    target.each(function (item, i)
+    {
+      attributeVal.push(i.outerHTML);
+    });
+    var notArray = target.find(".description").outerHTML;
+    console.log(attributeVal[0].split(brExp));
+    var editedInfo = attributeVal[0].split(brExp);
+    console.log(editedInfo);
+
+    var savedName = editedInfo[0]
+      .trim()
+      .replace('<div class="description">', "")
+      .trim()
+      .split(" ").toString();
+
+    var selectedCountry = editedInfo[3].trim();
+    console.log(savedName);
+
+    var firstWords = savedName.substring(0, savedName.lastIndexOf(",")).replace(',', " ");
+    var lastWord = savedName.split(",").splice(-1)
+
+
+    //for automation values --clear first
+    $('#automation_name').val("");
+    $('#automation_contact_number').val("");
+    $('#automation_email').val("");
+    $('#automation_address').val("");
+    $('#automation_country').val("");
+    $('#automation_state').val("");
+    $('#automation_city').val("");
+    $('#automation_postalcode').val("");
+
+
+    //add values
+    $('#automation_name').val(firstWords);
+    $('#automation_contact_number').val(lastWord);
+    $('#automation_email').val(editedInfo[1].trim());
+    $('#automation_address').val(editedInfo[2].trim());
+    $('#automation_country').val(selectedCountry);
+    $('#automation_state').val(editedInfo[4].trim());
+    $('#automation_city').val(editedInfo[5].trim());
+    $('#automation_postalcode').val(editedInfo[6].trim().replace("</div>", "").trim());
+
+    // if (page == 'delivery') {
+
+    //   //add values
+    //   $('#automation_name').val(firstWords);
+    //   $('#automation_contact_number').val(lastWord);
+    //   $('#automation_email').val(editedInfo[1].trim());
+    //   $('#automation_address').val(editedInfo[2].trim());
+    //   $('#automation_country').val(selectedCountry);
+    //   $('#automation_state').val(editedInfo[4].trim());
+    //   $('#automation_city').val(editedInfo[5].trim());
+    //   $('#automation_postalcode').val(editedInfo[6].trim().replace("</div>", ""));
+
+    // } else {
+
+
+    // }
+  }
+
   function edit_address(ele, page)
   {
     //for delivery settings page
@@ -232,6 +299,8 @@
         if ($("#first-name").length) {
           $(window).scrollTop(0);
         }
+
+
         if (page == 'delivery') {
 
           var cancelbutton = "<a href='' class='chk-add-btn btn-black-small-cmn' id = 'delcancel'>CANCEL</a>";
@@ -251,8 +320,33 @@
             "selected",
             "selected"
           );
+          $("select[name=country] option:contains(" + selectedCountry + ")").prop(
+            "selected",
+            "selected"
+          );
+
           $("#state").val(editedInfo[4].trim());
           $("#city").val(editedInfo[5].trim());
+
+          //for automation values --clear first
+          $('#automation_name').val("");
+          $('#automation_contact_number').val("");
+          $('#automation_email').val("");
+          $('#automation_address').val("");
+          $('#automation_country').val("");
+          $('#automation_state').val("");
+          $('#automation_city').val("");
+          $('#automation_postalcode').val("");
+
+          //add values
+          $('#automation_name').val(firstWords);
+          $('#automation_contact_number').val(lastWord);
+          $('#automation_email').val(editedInfo[1].trim());
+          $('#automation_address').val(editedInfo[2].trim());
+          $('#automation_country').val(selectedCountry);
+          $('#automation_state').val(editedInfo[4].trim());
+          $('#automation_city').val(editedInfo[5].trim());
+          $('#automation_postalcode').val(editedInfo[6].trim().replace("</div>", ""));
 
         }
         else {
@@ -266,11 +360,15 @@
 
           $("#postal-code").val(editedInfo[6].trim().replace("</div>", ""));
 
-
           // $("#country").removeAttr("selected");
           $("#country option").removeAttr("selected");
 
           $("select[name=country] option:contains(" + selectedCountry + ")").attr(
+            "selected",
+            "selected"
+          );
+
+          $("select[name=country] option:contains(" + selectedCountry + ")").prop(
             "selected",
             "selected"
           );
@@ -381,6 +479,13 @@
           $(this).removeClass('forEdit');
           $('#cancel').remove();
           $('#contact-email').val('');
+
+          //to support automation
+          setTimeout(function ()
+          {
+            cloneSavedAddress($('.address-box .description:last'));
+          }, 2000);
+
         }
 
       });
@@ -401,7 +506,7 @@
     if (pathname.indexOf("user/order/deliverydetail") > -1) {
       addButtonDelivery();
       loadIdDelivery();
-
+      appendElementForAutomation();
 
       $("body").on("click", ".address-box .svd-adrsbox-inner #edit", function ()
       // $(".address-box .svd-adrsbox-inner")
@@ -426,7 +531,11 @@
           console.log(address_id);
           deleteAddress(address_id);
           $('#delcancel').remove();
-
+          //to support automation
+          setTimeout(function ()
+          {
+            cloneSavedAddress($('.address-box .description:last'));
+          }, 2000);
         }
       });
 

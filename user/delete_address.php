@@ -16,7 +16,7 @@ $url = $baseUrl . '/api/developer-packages/custom-fields?packageId=' . getPackag
 $packageCustomFields = callAPI("GET", null, $url, false);
 
 $url = $baseUrl . '/api/v2/users/' . $userId .'/addresses/' . $addressID ;
-$result = callAPI("DELETE", $userToken , $url);
+$result = callAPI("DELETE", $userToken , $url); 
 echo json_encode(['result' => $result]);
 ?>
 
