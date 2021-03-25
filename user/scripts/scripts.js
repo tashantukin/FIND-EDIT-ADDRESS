@@ -456,12 +456,28 @@
       $("body").on("click", ".address-inner .address-box #edit",
         // .find("#edit")
         // .on("click", 
+
+       
         function ()
         {
-          $(this).parents(".address-inner .address-box").addClass("toEdit");
-          $("#address-form .btn-area .my-btn").addClass("forEdit");
 
-          edit_address($(this), 'user settings');
+          if ($('.cancel-edit').length > 0) {
+
+          } else {
+            $(this).parents(".address-inner .address-box").addClass("toEdit");
+
+            // $('#edit').unbind('click');;
+           // $('#address .container .seller-common-box:nth-child(2) .address-inner').append($("<div/>").addClass("plugin-overlay"));
+           // $('#address .container .seller-common-box:nth-child(2)').addClass("modal-backdrop fade in");
+            //$("body")
+             // $(this).addClass('active');
+             // $("edit:not(.active)")
+   
+             $("#address-form .btn-area .my-btn").addClass("forEdit");
+   
+             edit_address($(this), 'user settings');
+          }
+        
         });
 
       //save button
@@ -485,6 +501,11 @@
           {
             cloneSavedAddress($('.address-box .description:last'));
           }, 2000);
+
+          //enable the edit button
+          // $('#edit').bind('click');;
+          // $('#address .container .seller-common-box:nth-child(2)').append($("<div/>").addClass("modal-backdrop fade in"));
+         // $(".modal-backdrop .fade .in").remove();
 
         }
 
