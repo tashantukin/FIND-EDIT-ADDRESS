@@ -68,7 +68,7 @@
       data: JSON.stringify(data),
       success: function (response)
       {
-        console.log(JSON.stringify(response));
+        // console.log(JSON.stringify(response));
         custom = $.parseJSON(response);
         // console.log($.parseJSON(response));
         if (custom) {
@@ -159,7 +159,7 @@
       .find(".address-box .action:not(.hasEdit)")
       .each(function ()
       {
-        console.log("cave man!");
+        // console.log("cave man!");
         $(this).append(editicon);
         $(".icon-edit").css("background-image", imgLink);
         $(this).addClass("hasEdit");
@@ -208,7 +208,7 @@
 
     var savedName = editedInfo[0]
       .trim()
-      .replace('<div class="description">', "")
+      .replace('<div class=\"description\" data-ellipsis=\"7\">', "")
       .trim()
       .split(" ").toString();
 
@@ -277,7 +277,9 @@
 
     var savedName = editedInfo[0]
       .trim()
-      .replace('<div class="description">', "")
+      // .replace('<div class="description">', "")
+      .replace('<div class=\"description\" data-ellipsis=\"7\">', "")
+      .replace('<div class=\"description">', "")
       .trim()
       .split(" ").toString();
 
@@ -445,7 +447,8 @@
   {
     if (
       pathname.indexOf("user/marketplace/user-settings") > -1 ||
-      pathname.indexOf("/user/marketplace/seller-settings") > -1
+      pathname.indexOf("/user/marketplace/seller-settings") > -1 ||
+      pathname.indexOf("/user/marketplace/be-seller#") > -1 
 
     ) {
 
@@ -528,6 +531,19 @@
       addButtonDelivery();
       loadIdDelivery();
       appendElementForAutomation();
+
+
+
+      //add new button
+
+
+      // .add - new- ads .btn - black - small - cmn
+      
+
+      // #next - tab
+      
+      // //save button
+      // chk-add-btn
 
       $("body").on("click", ".address-box .svd-adrsbox-inner #edit", function ()
       // $(".address-box .svd-adrsbox-inner")

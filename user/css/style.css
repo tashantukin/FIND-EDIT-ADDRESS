@@ -49,3 +49,13 @@
   opacity: .5; /* in FireFox */ 
   filter: alpha(opacity=50); /* in IE */
 }
+
+
+.chk-add-btn.btn-black-small-cmn {
+  background-color: var(--another-green) !important;
+  color: var(--white) !important ;
+  border: 1px solid var(--another-green) !important;
+}
+.svd-adrsbox-inner>.description {
+  word-break: break-all !important
+}
