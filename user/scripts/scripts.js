@@ -14,6 +14,7 @@
   var urls = window.location.href.toLowerCase();
   var userId = $("#userGuid").val();
   var addressIdList = [];
+  var token = commonModule.getCookie('webapitoken');
   function waitForElement(elementPath, callBack)
   {
     window.setTimeout(function ()
@@ -109,6 +110,37 @@
     });
   }
 
+
+  function getAddressDetails(addressId, el)
+  {
+    var apiUrl = `/api/v2/users/${userId}/addresses/${addressId}`;
+    $.ajax({
+      url: apiUrl,
+      method: "GET",
+      headers: {
+        'Authorization': 'Bearer ' + token,
+    },
+      contentType: "application/json",
+      success: function (response)
+      {
+      
+      //  console.log(response);
+        if (response) {
+          el.attr("postcode", response.PostCode);
+          el.attr("city", response.City);
+          el.attr("state", response.State);
+          el.attr("country", response.Country);
+          el.attr("address", response.Line1);
+          el.attr('email', response.SpecialInstructions);
+          el.attr('name', response.Name.split('|')[0])
+          el.attr('contact', response.Name.split('|')[1])
+
+         // callback(custom);
+        }
+      },
+    });
+
+  }
   function loadId()
   {
     getAddresses(function (result)
@@ -123,6 +155,8 @@
       $(".address-inner .address-box:not(.hasid)").each(function (i)
       {
         $(this).attr("address-id", addressIdList[i]);
+        getAddressDetails(addressIdList[i], $(this))
+
         $(this).addClass("hasid");
       });
     });
@@ -142,6 +176,9 @@
       $(".saved-address .address-box:not(.hasid)").each(function (i)
       {
         $(this).attr("address-id", addressIdList[i]);
+
+        getAddressDetails(addressIdList[i], $(this))
+
         $(this).addClass("hasid");
       });
     });
@@ -268,12 +305,14 @@
     var brExp = /<br\s*\/?>/i;
     target.find(".description").each(function (item, i)
     {
+      $(this).attr('id', "address-desc");
+
       attributeVal.push(i.outerHTML);
     });
     var notArray = target.find(".description").outerHTML;
-    console.log(attributeVal[0].split(brExp));
+   // console.log(attributeVal[0].split(brExp));
     var editedInfo = attributeVal[0].split(brExp);
-    console.log(editedInfo);
+    //console.log(editedInfo);
 
     var savedName = editedInfo[0]
       .trim()
@@ -283,6 +322,9 @@
       .trim()
       .split(" ").toString();
 
+    
+    
+  
     var selectedCountry = editedInfo[3].trim();
     console.log(savedName);
 
@@ -311,24 +353,24 @@
           var firstWords = savedName.substring(0, savedName.lastIndexOf(",")).replace(',', " ");;
           var lastWord = savedName.split(",").splice(-1)
 
-          $("#ads-first-name").val(firstWords);
+          $("#ads-first-name").val(target.attr('name'));
 
-          $("#ads-last-name").val(lastWord);
-          $("#delEmail").val(editedInfo[1].trim());
-          $("#address").val(editedInfo[2].trim());
-          $("#postalcode").val(editedInfo[6].trim().replace("</div>", ""));
+          $("#ads-last-name").val(target.attr('contact'));
+          $("#delEmail").val(target.attr('email'));
+          $("#address").val(target.attr('address'));
+          $("#postalcode").val(target.attr('postcode'));
           $("#country").removeAttr("selected");
-          $("select[name=country] option:contains(" + selectedCountry + ")").attr(
+          $("select[name=country] option:contains(" + target.attr('country') + ")").attr(
             "selected",
             "selected"
           );
-          $("select[name=country] option:contains(" + selectedCountry + ")").prop(
+          $("select[name=country] option:contains(" + target.attr('country') + ")").prop(
             "selected",
             "selected"
           );
 
-          $("#state").val(editedInfo[4].trim());
-          $("#city").val(editedInfo[5].trim());
+          $("#state").val(target.attr('state'));
+          $("#city").val(target.attr('city'));
 
           //for automation values --clear first
           $('#automation_name').val("");
@@ -341,42 +383,45 @@
           $('#automation_postalcode').val("");
 
           //add values
-          $('#automation_name').val(firstWords);
-          $('#automation_contact_number').val(lastWord);
-          $('#automation_email').val(editedInfo[1].trim());
-          $('#automation_address').val(editedInfo[2].trim());
+          $('#automation_name').val(target.attr('name'));
+          $('#automation_contact_number').val(target.attr('contact'));
+          $('#automation_email').val(target.attr('email'));
+          $('#automation_address').val(target.attr('address'));
           $('#automation_country').val(selectedCountry);
-          $('#automation_state').val(editedInfo[4].trim());
-          $('#automation_city').val(editedInfo[5].trim());
-          $('#automation_postalcode').val(editedInfo[6].trim().replace("</div>", ""));
+          $('#automation_state').val(target.attr('state'));
+          $('#automation_city').val(target.attr('city'));
+          $('#automation_postalcode').val(target.attr('postcode'));
 
         }
         else {
           var firstWords = savedName.substring(0, savedName.lastIndexOf(",")).replace(',', " ");
           var lastWord = savedName.split(",").splice(-1)
 
-          $("#first-name").val(firstWords);
-          $("#last-name").val(lastWord);
-          $("#contact-email").val(editedInfo[1].trim());
-          $("#myaddress").val(editedInfo[2].trim());
+          $("#first-name").val(target.attr('name'));
+          $("#last-name").val(target.attr('contact'));
+          $("#contact-email").val(target.attr('email'));
+          $("#myaddress").val(target.attr('address'));
+          
+            $("#postal-code").val(target.attr('postcode'));
 
-          $("#postal-code").val(editedInfo[6].trim().replace("</div>", ""));
+          
+         
 
           // $("#country").removeAttr("selected");
           $("#country option").removeAttr("selected");
 
-          $("select[name=country] option:contains(" + selectedCountry + ")").attr(
+          $("select[name=country] option:contains(" + target.attr('country') + ")").attr(
             "selected",
             "selected"
           );
 
-          $("select[name=country] option:contains(" + selectedCountry + ")").prop(
+          $("select[name=country] option:contains(" + target.attr('country') + ")").prop(
             "selected",
             "selected"
           );
 
-          $("#state").val(editedInfo[4].trim());
-          $("#city").val(editedInfo[5].trim());
+          $("#state").val(target.attr('state'));
+          $("#city").val(target.attr('city'));
 
           //for automation values --clear first
           $('#automation_name').val("");
@@ -389,14 +434,14 @@
           $('#automation_postalcode').val("");
 
           //add values
-          $('#automation_name').val(firstWords);
-          $('#automation_contact_number').val(lastWord);
-          $('#automation_email').val(editedInfo[1].trim());
-          $('#automation_address').val(editedInfo[2].trim());
+          $('#automation_name').val(target.attr('name'));
+          $('#automation_contact_number').val(target.attr('contact'));
+          $('#automation_email').val(target.attr('email'));
+          $('#automation_address').val(target.attr('address'));
           $('#automation_country').val(selectedCountry);
-          $('#automation_state').val(editedInfo[4].trim());
-          $('#automation_city').val(editedInfo[5].trim());
-          $('#automation_postalcode').val(editedInfo[6].trim().replace("</div>", ""));
+          $('#automation_state').val(target.attr('state'));
+          $('#automation_city').val(target.attr('city'));
+          $('#automation_postalcode').val(target.attr('postcode'));
 
         }
 
@@ -452,9 +497,11 @@
 
     ) {
 
+
       appendElementForAutomation();
       loadId();
       addButton();
+
 
       $("body").on("click", ".address-inner .address-box #edit",
         // .find("#edit")
@@ -469,13 +516,7 @@
           } else {
             $(this).parents(".address-inner .address-box").addClass("toEdit");
 
-            // $('#edit').unbind('click');;
-           // $('#address .container .seller-common-box:nth-child(2) .address-inner').append($("<div/>").addClass("plugin-overlay"));
-           // $('#address .container .seller-common-box:nth-child(2)').addClass("modal-backdrop fade in");
-            //$("body")
-             // $(this).addClass('active');
-             // $("edit:not(.active)")
-   
+           
              $("#address-form .btn-area .my-btn").addClass("forEdit");
    
              edit_address($(this), 'user settings');
@@ -514,6 +555,7 @@
 
       });
 
+      //tab pane
       $("body").on("click", "#address-tab", function ()
       {
         loadId();
@@ -532,18 +574,6 @@
       loadIdDelivery();
       appendElementForAutomation();
 
-
-
-      //add new button
-
-
-      // .add - new- ads .btn - black - small - cmn
-      
-
-      // #next - tab
-      
-      // //save button
-      // chk-add-btn
 
       $("body").on("click", ".address-box .svd-adrsbox-inner #edit", function ()
       // $(".address-box .svd-adrsbox-inner")
