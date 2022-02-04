@@ -493,7 +493,7 @@
     if (
       pathname.indexOf("user/marketplace/user-settings") > -1 ||
       pathname.indexOf("/user/marketplace/seller-settings") > -1 ||
-      pathname.indexOf("/user/marketplace/be-seller#") > -1 
+      pathname.indexOf("/user/marketplace/be-seller") > -1 
 
     ) {
 
@@ -529,10 +529,10 @@
       {
         //Add validation here before saving
         // || !validateEmail($('#contact-email').val()
-        if ($('#first-name').val() == "" || $('#last-name').val() == "" || $('#contact-email').val() == "" || $('#myaddress').val() == "" || $('#country').val() == "(Select Country)" || $('#state').val() == "" || $('#city').val() == "" || $('#postal-code').val() == "") {
-          console.log('handled validation');
+        if ( $('#myaddress').val() == "" || $('#country').val() == "(Select Country)"  || $('#city').val() == "" ) {
+          console.log('validatio empty field');
         } else {
-          console.log("button clicked!");
+          console.log('new address modified')
           var address_id = $(".address-inner").find(".toEdit").attr("address-id");
           console.log(address_id);
           deleteAddress(address_id);
